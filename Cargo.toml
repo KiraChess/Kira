@@ -1,0 +1,11 @@
+[package]
+name = "kira1a"
+version = "0.1.0"
+edition = "2024"
+authors = ["whosnds"]
+license = "MIT"
+description = "Kira 1 Alpha independent NNUE chess engine"
+
+[dependencies]
+
+[dev-dependencies]

@@ -1,0 +1,13 @@
+{"type":"run","date":"2026-10-24","stockfish":"/opt/homebrew/bin/stockfish (Stockfish 19)","command":"python3 tools/verify/m0.py --engine /opt/homebrew/bin/stockfish --stockfish /opt/homebrew/bin/stockfish --known-only --artifact /tmp/m0-stockfish-known.jsonl","scope":"Oracle/spec cross-check and harness smoke only; Stockfish was supplied as both UCI processes because no Kira engine exists yet."}
+{"case":"startpos","depth":5,"expected":4865609,"stockfish_nodes":4865609,"matches":true}
+{"case":"startpos","depth":6,"expected":119060324,"stockfish_nodes":119060324,"matches":true}
+{"case":"kiwipete","depth":4,"expected":4085603,"stockfish_nodes":4085603,"matches":true}
+{"case":"kiwipete","depth":5,"expected":193690690,"stockfish_nodes":193690690,"matches":true}
+{"case":"position-3","depth":5,"expected":674624,"stockfish_nodes":674624,"matches":true}
+{"case":"position-3","depth":6,"expected":11030083,"stockfish_nodes":11030083,"matches":true}
+{"case":"position-4","depth":4,"expected":422333,"stockfish_nodes":422333,"matches":true}
+{"case":"position-4","depth":5,"expected":15833292,"stockfish_nodes":15833292,"matches":true}
+{"case":"position-5","depth":4,"expected":2103487,"stockfish_nodes":2103487,"matches":true}
+{"case":"position-5","depth":5,"expected":89941194,"stockfish_nodes":89941194,"matches":true}
+{"case":"position-6","depth":4,"expected":3894594,"stockfish_nodes":3894594,"matches":true}
+{"case":"position-6","depth":5,"expected":164075551,"stockfish_nodes":164075551,"matches":true}

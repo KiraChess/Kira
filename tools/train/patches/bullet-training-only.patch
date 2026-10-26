@@ -1,0 +1,96 @@
+diff --git a/Cargo.toml b/Cargo.toml
+index 54f8700..11b37d1 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -16 +15,0 @@ members = [
+-    "crates/utils",
+diff --git a/crates/bullet_lib/Cargo.toml b/crates/bullet_lib/Cargo.toml
+index 3e58936..6beea05 100644
+--- a/crates/bullet_lib/Cargo.toml
++++ b/crates/bullet_lib/Cargo.toml
+@@ -16,2 +15,0 @@ bullet-trainer = { workspace = true }
+-bulletformat = "1.8.0"
+-montyformat = "0.9.2"
+@@ -20,2 +17,0 @@ rand = "0.9.0"
+-sfbinpack = "0.6.4"
+-viriformat = "2.0.1"
+@@ -27,36 +22,0 @@ metal = ["bullet-gpu/metal", "bullet-trainer/metal"]
+-
+-[[example]]
+-name = "simple"
+-path = "../../examples/simple.rs"
+-
+-[[example]]
+-name = "test1"
+-path = "../../examples/tests/test1.rs"
+-
+-[[example]]
+-name = "test2"
+-path = "../../examples/tests/test2.rs"
+-
+-[[example]]
+-name = "test3"
+-path = "../../examples/tests/test3.rs"
+-
+-[[example]]
+-name = "1_simple"
+-path = "../../examples/progression/1_simple.rs"
+-
+-[[example]]
+-name = "2_output_buckets"
+-path = "../../examples/progression/2_output_buckets.rs"
+-
+-[[example]]
+-name = "3_input_buckets"
+-path = "../../examples/progression/3_input_buckets.rs"
+-
+-[[example]]
+-name = "4_multi_layer"
+-path = "../../examples/progression/4_multi_layer.rs"
+-
+-[[example]]
+-name = "advanced"
+-path = "../../examples/advanced/main.rs"
+diff --git a/crates/bullet_lib/src/game.rs b/crates/bullet_lib/src/game.rs
+index 912baf2..4a1ae36 100644
+--- a/crates/bullet_lib/src/game.rs
++++ b/crates/bullet_lib/src/game.rs
+@@ -1,2 +1 @@
+-/// Contains the `InputType` trait for implementing custom input types,
+-/// as well as several premade input formats that are commonly used.
++/// Contains the generic sparse-input trait used by the trainer.
+@@ -4,11 +2,0 @@ pub mod inputs;
+-/// Contains the `OutputBuckets` trait for implementing custom output bucket types,
+-/// as well as several premade output buckets that are commonly used.
+-pub mod outputs;
+-
+-/// Contains data formats
+-pub mod formats {
+-    pub use bulletformat;
+-    pub use montyformat;
+-    pub use sfbinpack;
+-    pub use viriformat;
+-}
+diff --git a/crates/bullet_lib/src/game/inputs.rs b/crates/bullet_lib/src/game/inputs.rs
+index 6158e00..60ad337 100644
+--- a/crates/bullet_lib/src/game/inputs.rs
++++ b/crates/bullet_lib/src/game/inputs.rs
+@@ -1,4 +0,0 @@
+-mod adapter;
+-mod ataxx147;
+-mod chess768;
+-mod chess_buckets;
+@@ -6,5 +1,0 @@ mod factorised;
+-
+-pub use adapter::MarlinFormatAdapter;
+-pub use ataxx147::{Ataxx98, Ataxx147};
+-pub use chess_buckets::{ChessBuckets, ChessBucketsMirrored};
+-pub use chess768::Chess768;
+diff --git a/crates/bullet_lib/src/lib.rs b/crates/bullet_lib/src/lib.rs
+index 7d27c34..3c73eaf 100644
+--- a/crates/bullet_lib/src/lib.rs
++++ b/crates/bullet_lib/src/lib.rs
+@@ -13,3 +12,0 @@ pub mod trainer;
+-/// Contains `ValueTrainer`, the new and improved
+-/// way to train value networks.
+-pub mod value;
