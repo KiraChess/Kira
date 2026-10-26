@@ -1,5 +1,5 @@
 use std::io::{self, BufRead, BufWriter, Write};
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex};
 use std::thread::{self, JoinHandle};
@@ -26,7 +26,11 @@ enum EvalMode {
     Nnue,
 }
 
-const DEFAULT_EVAL_FILE: &str = "data/generation-1/kira1a-gen1-842e3870.nnue";
+const DEFAULT_NET_NAME: &str = "kira1a-retrained.nnue";
+
+fn bundled_network_path(executable: &Path) -> Option<PathBuf> {
+    executable.parent().map(|directory| directory.join(DEFAULT_NET_NAME))
+}
 
 fn emit(output: &Output, line: &str) {
     if let Ok(mut out) = output.lock() {
@@ -49,10 +53,24 @@ fn main() {
     let mut game_history = vec![board.hash()];
     let searcher = Arc::new(Mutex::new(Searcher::new(16)));
     let mut worker: Option<SearchWorker> = None;
-    let mut eval_mode = EvalMode::Hce;
-    let mut eval_file = DEFAULT_EVAL_FILE.to_string();
-    let mut nnue_network: Option<Arc<QuantizedNnueNetwork<128>>> = None;
-    let mut evaluator: Arc<dyn Evaluator> = Arc::new(Hce);
+    // Resolve against the executable, never against the GUI's working directory.
+    let default_path = std::env::current_exe()
+        .map_err(|error| error.to_string())
+        .and_then(|path| bundled_network_path(&path).ok_or_else(|| "executable has no parent directory".to_string()));
+    let mut eval_file = default_path.as_ref().map(|path| path.to_string_lossy().into_owned()).unwrap_or_default();
+    let default_eval_file = eval_file.clone();
+    let mut want_nnue = true;
+    let loaded = default_path.and_then(|path| QuantizedNnueNetwork::<128>::load(&path).map(Arc::new));
+    let (mut eval_mode, mut nnue_network, mut evaluator, startup_status): (_, _, Arc<dyn Evaluator>, _) = match loaded {
+        Ok(network) => {
+            let message = format!("info string NNUE loaded {}; NNUE is active", one_line(&eval_file));
+            (EvalMode::Nnue, Some(Arc::clone(&network)), network, message)
+        }
+        Err(error) => {
+            let message = format!("info string NNUE unavailable: {}; HCE is active", one_line(&error));
+            (EvalMode::Hce, None, Arc::new(Hce), message)
+        }
+    };
 
     for input in stdin.lock().lines() {
         let Ok(line) = input else { break; };
@@ -62,8 +80,16 @@ fn main() {
             emit(&output, "id author whosnds");
             emit(&output, "option name Hash type spin default 16 min 1 max 4096");
             emit(&output, "option name Threads type spin default 1 min 1 max 1");
-            emit(&output, "option name Eval type combo default HCE var HCE var NNUE");
-            emit(&output, &format!("option name EvalFile type string default {DEFAULT_EVAL_FILE}"));
+            emit(&output, "option name Eval type combo default NNUE var HCE var NNUE");
+            let default_file = if eval_file.is_empty() { "<empty>" } else { &eval_file };
+            emit(&output, &format!("option name EvalFile type string default {}", one_line(default_file)));
+            if eval_mode == EvalMode::Nnue {
+                emit(&output, &format!("info string NNUE loaded {}; NNUE is active", one_line(&eval_file)));
+            } else if nnue_network.is_none() && eval_file == default_eval_file {
+                emit(&output, &startup_status);
+            } else {
+                emit(&output, "info string HCE is active");
+            }
             emit(&output, "uciok");
         } else if command == "isready" {
             emit(&output, "readyok");
@@ -108,10 +134,13 @@ fn main() {
                 }
             } else if name.eq_ignore_ascii_case("eval") {
                 if value.eq_ignore_ascii_case("hce") {
+                    want_nnue = false;
                     eval_mode = EvalMode::Hce;
                     evaluator = Arc::new(Hce);
                     if let Ok(mut engine) = searcher.lock() { engine.clear(); }
+                    emit(&output, "info string HCE is active");
                 } else if value.eq_ignore_ascii_case("nnue") {
+                    want_nnue = true;
                     if nnue_network.is_none() && !eval_file.is_empty() {
                         match QuantizedNnueNetwork::<128>::load(Path::new(&eval_file)) {
                             Ok(network) => nnue_network = Some(Arc::new(network)),
@@ -122,6 +151,7 @@ fn main() {
                         eval_mode = EvalMode::Nnue;
                         evaluator = network.clone();
                         if let Ok(mut engine) = searcher.lock() { engine.clear(); }
+                        emit(&output, "info string NNUE is active");
                     } else {
                         emit(&output, "info string Eval NNUE unavailable; HCE remains active");
                     }
@@ -144,11 +174,12 @@ fn main() {
                             let network = Arc::new(network);
                             eval_file = value.to_string();
                             nnue_network = Some(Arc::clone(&network));
-                            if eval_mode == EvalMode::Nnue {
+                            if want_nnue {
+                                eval_mode = EvalMode::Nnue;
                                 evaluator = network;
                             }
                             if let Ok(mut engine) = searcher.lock() { engine.clear(); }
-                            emit(&output, &format!("info string EvalFile loaded {}", one_line(&eval_file)));
+                            emit(&output, &format!("info string EvalFile loaded {}; {} is active", one_line(&eval_file), if eval_mode == EvalMode::Nnue { "NNUE" } else { "HCE" }));
                         }
                         Err(error) => emit(&output, &format!("info string EvalFile load failed; current settings unchanged: {}", one_line(&error))),
                     }

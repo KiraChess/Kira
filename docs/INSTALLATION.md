@@ -1,60 +1,45 @@
-# Installing Kira 1 Alpha
+# Installing Kira 1 Alpha v1.0.1
 
-## Supported release
+Kira is a UCI chess engine. You need a chess GUI that supports UCI engines to play on a graphical board.
 
-The provided executable is **macOS arm64 for Apple Silicon**, validated on **macOS 27.2**. The Mach-O header declares a minimum OS of 11.0, but older macOS versions have not been verified. No Intel, Linux, or Windows binary is provided. The executable links only to macOS's system library.
+## Download and install
 
-Download `kira-1-alpha-macos-arm64.tar.gz` and `SHA256SUMS` from [Kira 1 Alpha](https://github.com/KiraChess/Kira/releases/tag/kira-1-alpha).
+Download the appropriate ZIP and `SHA256SUMS` from the [releases page](https://github.com/KiraChess/Kira/releases):
 
-```sh
-shasum -a 256 kira-1-alpha-macos-arm64.tar.gz
-# Compare the result with that file's entry in SHA256SUMS.
-tar -xzf kira-1-alpha-macos-arm64.tar.gz
-cd kira-1-alpha-macos-arm64
-chmod +x kira1a
-./kira1a
-```
+- **Apple Silicon Mac:** `kira-1-alpha-v1.0.1-macos-arm64.zip`
+- **Windows x64:** `kira-1-alpha-v1.0.1-windows-x64.zip`
 
-The archive includes the executable, released NNUE, this guide, MIT license, and internal checksums. The executable is unsigned and not notarized. If macOS blocks it, review the downloaded release and checksum before following macOS's approval prompt.
+Compare the ZIP's SHA-256 checksum with its entry in `SHA256SUMS`, then extract the entire ZIP. On macOS, use `shasum -a 256 path/to/download.zip`; on Windows PowerShell, use `Get-FileHash path\to\download.zip -Algorithm SHA256`.
 
-## UCI chess GUI
+In your chess GUI, add the extracted `kira1a` (macOS) or `kira1a.exe` (Windows) as a UCI engine. Keep `kira1a-retrained.nnue` in the same folder as the executable. Kira looks for it relative to the executable, regardless of the GUI's working directory, and selects NNUE when it loads successfully. No Rust installation or manual network configuration is required.
 
-Add the extracted `kira1a` executable as a UCI engine. Configure:
+The original macOS Alpha was validated on Apple Silicon with macOS 27.2; older macOS versions have not been verified. The macOS executable is unsigned and not notarized. If macOS blocks it, check the download and checksum before following the system approval prompt. See the release notes for Windows verification details.
 
-| Option | Value |
+## Network and UCI options
+
+Check the GUI's engine log for `info string NNUE loaded ...; NNUE is active` after startup. If the bundled network is missing, corrupt or incompatible, Kira reports `info string NNUE unavailable ...; HCE is active` and runs using its handcrafted evaluation instead. `readyok` alone does not confirm that NNUE loaded. If this happens, restore the network beside the executable and restart the engine, or supply a valid network with **EvalFile**.
+
+| Option | Use |
 |---|---|
-| EvalFile | Absolute path to the extracted `kira1a-retrained.nnue` |
-| Eval | NNUE |
-| Threads | 1 (the only supported value) |
-| Hash | 16 MB by default; the ladder used 64 MB |
+| EvalFile | Path to a compatible NNUE file; overrides the bundled default. |
+| Eval | Select `NNUE` or `HCE`. |
+| Threads | 1 (the only supported value). |
+| Hash | 16 MB by default; the historical ladder used 64 MB. |
 
-Set `EvalFile` before selecting `NNUE`, save the options in your GUI, and check for `info string EvalFile loaded ...` in its engine log. A successful `isready` alone does not prove that a network loaded.
-
-The engine starts in **HCE** mode. Its built-in default `EvalFile` names a legacy Gen1 network that is not shipped in the runtime archive. Explicit configuration is required to use this release's NNUE. If the net fails to load, Kira reports the failure and may continue with HCE or the previously selected configuration.
+To override the network, set `EvalFile` in your GUI and check the engine log for the loading result. If needed, select `Eval = NNUE` after loading. Consult your GUI's documentation for where to configure UCI options.
 
 ## Terminal session
 
-Run `./kira1a`, then enter these commands interactively. Replace the example path with the actual absolute path on your Mac. UCI paths are entered without shell quotes, even if they contain spaces.
+Launch the extracted executable and enter the following commands interactively:
 
 ```text
 uci
-setoption name EvalFile value /absolute/path/kira-1-alpha-macos-arm64/kira1a-retrained.nnue
-setoption name Eval value NNUE
-setoption name Hash value 64
-setoption name Threads value 1
 isready
 ucinewgame
 position startpos
 go movetime 1000
 ```
 
-Wait for `bestmove ...`, then enter `quit`. `uci` should print `id name Kira 1 Alpha`, `id author whosnds`, and `uciok`; `isready` should print `readyok`. The engine also accepts clock controls, increments, depth and node limits, `go infinite`, and `stop`.
+Wait for `bestmove ...`, then enter `quit`. The engine identifies itself and responds with `uciok` and `readyok`. To use a different network, enter `setoption name EvalFile value /absolute/path/to/network.nnue`, followed if needed by `setoption name Eval value NNUE`. UCI paths are entered without shell quotes, even if they contain spaces. On Windows, use the corresponding Windows path.
 
 Do not send `quit` immediately after `go` in a shell pipe when expecting a completed search: `quit` stops the active search.
-
-## Checksums
-
-- Engine SHA-256: `34b12d73f2342e2b0a7cfac76231a176e960e2d6a929278179de051dbb6cf17c`
-- NNUE SHA-256: `9ae5897d19b5a3e283c89b9267e2a4c28381dc1fde5aba2513d6c7d52994f756`
-
-The release-level `SHA256SUMS` covers each downloadable asset except itself. The runtime archive has a separate internal checksum file.
