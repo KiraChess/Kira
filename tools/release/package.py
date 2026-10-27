@@ -81,7 +81,7 @@ def smoke(executable, cwd, expected, override=None):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--platform", required=True, choices=["windows-x64", "macos-arm64"])
+    parser.add_argument("--platform", required=True, choices=["windows-x64", "macos-arm64", "linux-x64"])
     parser.add_argument("--target", required=True)
     parser.add_argument("--network", type=Path, help="Use a local copy of the frozen network instead of downloading it")
     args = parser.parse_args()
@@ -91,7 +91,7 @@ def main():
         raise SystemExit(f"Missing built executable: {binary}")
     out = ROOT / "dist" / "release"
     out.mkdir(parents=True, exist_ok=True)
-    name = f"kira-1-alpha-v1.0.1-{args.platform}"
+    name = f"kira-1-alpha-v1.0.2-{args.platform}"
     with tempfile.TemporaryDirectory(prefix="kira package ") as temp:
         temp = Path(temp)
         bundle = temp / name
@@ -113,7 +113,7 @@ def main():
                 z.write(file, Path(name) / file.name)
         extracted = temp / "extracted package"
         extracted.mkdir()
-        if args.platform == "macos-arm64":
+        if args.platform in ("macos-arm64", "linux-x64"):
             # Use the system extractor to verify that the ZIP preserves executable mode.
             subprocess.run(["unzip", "-q", str(archive), "-d", str(extracted)], check=True)
         else:

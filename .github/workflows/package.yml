@@ -25,21 +25,41 @@ jobs:
           - os: macos-14
             platform: macos-arm64
             target: aarch64-apple-darwin
+          - os: ubuntu-22.04
+            platform: linux-x64
+            target: x86_64-unknown-linux-musl
     runs-on: ${{ matrix.os }}
     env:
       RUSTFLAGS: ${{ matrix.platform == 'windows-x64' && '-C target-feature=+crt-static' || '' }}
     steps:
       - uses: actions/checkout@v4
+      - name: Install Linux build tools
+        if: matrix.platform == 'linux-x64'
+        run: sudo apt-get update && sudo apt-get install -y musl-tools unzip
       - name: Install Rust 1.98.1
         run: rustup toolchain install 1.98.1 --profile minimal --target ${{ matrix.target }}
       - name: Test UCI network startup
         run: cargo +1.98.1 test --locked --test uci_network_startup --target ${{ matrix.target }}
       - name: Build engine
         run: cargo +1.98.1 build --release --locked --bin kira1a --target ${{ matrix.target }}
+      - name: Check Linux runtime dependencies
+        if: matrix.platform == 'linux-x64'
+        shell: bash
+        run: |
+          binary=target/${{ matrix.target }}/release/kira1a
+          file "$binary"
+          if readelf -d "$binary" | grep -q '(NEEDED)'; then
+            echo "Linux binary has shared library dependencies"
+            exit 1
+          fi
+          if readelf -l "$binary" | grep -q 'Requesting program interpreter'; then
+            echo "Linux binary requires a dynamic loader"
+            exit 1
+          fi
       - name: Package and smoke test
         run: python tools/release/package.py --platform ${{ matrix.platform }} --target ${{ matrix.target }}
       - uses: actions/upload-artifact@v4
         with:
-          name: kira-1-alpha-v1.0.1-${{ matrix.platform }}
+          name: kira-1-alpha-v1.0.2-${{ matrix.platform }}
           path: dist/release/*
           if-no-files-found: error

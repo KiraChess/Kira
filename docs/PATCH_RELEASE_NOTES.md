@@ -1,15 +1,13 @@
-# Kira 1 Alpha v1.0.1
+# Kira 1 Alpha v1.0.2
 
-This usability and compatibility hotfix makes Kira easier to install. Extract the ZIP for your platform and add `kira1a` (macOS) or `kira1a.exe` (Windows) to a UCI chess GUI. Keep the included `kira1a-retrained.nnue` beside the executable: Kira loads it automatically and uses NNUE when it is available.
+Kira now has a **Linux x64 build**, alongside the Apple Silicon macOS and Windows x64 builds. This release also cleans up the repository and installation docs to make them easier to read.
 
-If the network cannot load, Kira reports the failure and active HCE fallback in its UCI log. `EvalFile` remains available for overriding the network path. See [installation instructions](https://github.com/KiraChess/Kira/blob/kira-1-alpha-v1.0.1/docs/INSTALLATION.md).
+Download the ZIP for your platform, extract it, and add `kira1a` (macOS or Linux) or `kira1a.exe` (Windows) to a UCI chess GUI. Keep `kira1a-retrained.nnue` next to the executable so Kira can load it automatically. On Linux, run `chmod +x kira1a` if necessary. Check `SHA256SUMS` to verify your download. See the [installation guide](https://github.com/KiraChess/Kira/blob/kira-1-alpha-v1.0.2/docs/INSTALLATION.md).
 
-Downloads:
+If the network cannot load, Kira reports the failure in the UCI log and falls back to handcrafted evaluation (HCE). You can override the network path with the `EvalFile` UCI option.
 
-- `kira-1-alpha-v1.0.1-macos-arm64.zip` — Apple Silicon macOS.
-- `kira-1-alpha-v1.0.1-windows-x64.zip` — Windows x64; see the published release for verification details.
-- `SHA256SUMS` — checksums for the release files.
+The macOS build is unsigned and not notarized. The Windows build passed a UCI runtime smoke test on Windows Server 2022 for v1.0.1, but has not been tested in an interactive chess GUI.
 
-The original frozen Alpha candidate's internal Stockfish-UCI_Elo anchored estimate was **2194.6 Elo (95% CI 2149.2–2240.0)**. This is historical calibration evidence, not a new measurement of v1.0.1 or an official CCRL rating. Possible score-adjudication effects on 207 ladder games remain unquantified; see [measurement notes](https://github.com/KiraChess/Kira/blob/kira-1-alpha-v1.0.1/docs/MEASUREMENTS.md). The network weights are unchanged and the original match campaigns were not repeated.
+The original Alpha's **2194.6 Elo estimate (95% CI 2149.2–2240.0)** is an internal Stockfish-UCI_Elo anchored estimate, not an official CCRL rating or a new measurement of this patch. Possible score-adjudication effects on **207 ladder games** remain unquantified; see the [measurement notes](https://github.com/KiraChess/Kira/blob/kira-1-alpha-v1.0.2/docs/MEASUREMENTS.md). The NNUE weights are unchanged.
 
-The original [Kira 1 Alpha release](https://github.com/KiraChess/Kira/releases/tag/kira-1-alpha) and its artifacts remain available.
+Earlier [releases](https://github.com/KiraChess/Kira/releases) remain available.

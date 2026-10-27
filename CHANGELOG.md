@@ -1,5 +1,11 @@
 # Changelog
 
+## Kira 1 Alpha v1.0.2
+
+- Add a Linux x64 release package.
+- Clean up the repository documentation and installation instructions.
+- Keep the original Alpha network and historical measurements; the 2194.6 internal estimate is not a new measurement of this patch.
+
 ## Kira 1 Alpha v1.0.1
 
 - Load the bundled NNUE automatically from the executable's directory and use it by default when available.

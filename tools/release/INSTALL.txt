@@ -1,7 +1,7 @@
-Kira 1 Alpha v1.0.1
+Kira 1 Alpha v1.0.2
 
 1. Extract the entire ZIP archive to a folder of your choice.
-2. Add kira1a.exe (Windows) or kira1a (Apple Silicon macOS) as a UCI engine
+2. Add kira1a.exe (Windows) or kira1a (Apple Silicon macOS or Linux x64) as a UCI engine
    in your chess GUI. Keep kira1a-retrained.nnue beside the executable.
 3. Start a game. Kira loads the bundled NNUE automatically.
 
@@ -11,6 +11,9 @@ set the EvalFile UCI option to its absolute path. Eval selects NNUE or HCE.
 
 macOS: the executable is unsigned and not notarized. If macOS blocks it, review
 the download and its checksum before approving it through macOS security settings.
+
+Linux: extract with an archive tool that preserves executable permissions. If
+needed, run `chmod +x kira1a` before adding it to your chess GUI.
 
 Kira and the bundled network are licensed under MIT; see LICENSE.
 Created by whosnds. https://github.com/KiraChess/Kira
