@@ -20,7 +20,7 @@ The original frozen Alpha candidate's **internal Stockfish-UCI_Elo anchored esti
 
 **This is not an official CCRL, FIDE, or Lichess rating.** No independently rated reference engine was available locally. The interval describes sampling uncertainty; it does not account for calibration or adjudication bias.
 
-**PV/adjudication caveat:** fastchess recorded 5,289 Stockfish-named PV/bestmove warnings in the ladder. Reviewers matched the warning-named moves to the recorded Stockfish moves, but possible score-adjudication effects on **207 ladder games** remain unquantified. The 1,000-game soak also had 12,085 such warnings and 419 score-adjudicated Stockfish games. The warnings are retained as an unresolved limitation of the measurement.
+**PV/adjudication takeaway:** fastchess recorded 5,289 Stockfish-named PV/bestmove warnings in the ladder. Reviewers matched the warning-named moves to the recorded Stockfish moves, but possible score-adjudication effects on **207 ladder games** remain unquantified. The 1,000-game soak also had 12,085 such warnings and 419 score-adjudicated Stockfish games. The warnings are retained as an unresolved limitation of the measurement.
 
 | Existing verification | Recorded result |
 |---|---|
